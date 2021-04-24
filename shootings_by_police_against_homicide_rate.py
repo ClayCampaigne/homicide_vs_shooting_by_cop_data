@@ -201,8 +201,6 @@ fig, ax = plt.subplots(figsize=(20,12))
 ax.scatter(x=np.log(data_by_state['comp_years_homicide']),
            y=np.log(data_by_state['pofat_rate']))
 
-data_by_state['log_pofat_rate'] = np.log(data_by_state['pofat_rate'])
-
 for i, txt in enumerate(data_by_state['state']):
     plt.annotate(txt, (np.log(data_by_state.loc[i,'comp_years_homicide']), np.log(data_by_state.loc[i, 'pofat_rate'])))
 
