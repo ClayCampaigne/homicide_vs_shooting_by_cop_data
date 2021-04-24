@@ -7,6 +7,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_theme(color_codes=True)
 
 
 # In[ ]:
@@ -34,15 +36,40 @@ h = pd.read_csv(homicide_path)
 s = pd.read_csv(shooting_by_police_path)
 s.columns = [elem.replace('country', 'Country') for elem in s.columns]
 data_by_country = pd.merge(h,s, on='Country', how='inner')
+
+data_by_country.loc[:,'ratePer10M'] = data_by_country.loc[:,'ratePer10M'] + .001
+
+data_by_country['log_homicide_rate'] = np.log(data_by_country.loc[:,'homicide rate'])
+data_by_country['log_ratePer10M'] = np.log(data_by_country.loc[:,'ratePer10M'])
+
 fig, ax = plt.subplots(figsize=(20,12))
-ax.scatter(x=np.log(data_by_country['homicide rate']),
-           y=np.log(data_by_country['ratePer10M']),
+ax.scatter(x=np.log(data_by_country.loc[:,'homicide rate']),
+           y=np.log(data_by_country.loc[:,'ratePer10M']),
            label = data_by_country['Country'])
 
 for i, txt in enumerate(data_by_country['Country']):
     plt.annotate(txt, (np.log(data_by_country.loc[i,'homicide rate']), np.log(data_by_country.loc[i, 'ratePer10M'])))
 
+sns.regplot(x="log_homicide_rate", y="log_ratePer10M", data=data_by_country, ax=ax)
+    
 fig.savefig('pofat_vs_hom_by_country.png')
+
+
+# In[ ]:
+
+
+fig, ax = plt.subplots(figsize=(20,12))
+ax.scatter(x=data_by_country['homicide rate'],
+           y=data_by_country['ratePer10M'],
+           label = data_by_country['Country'])
+
+
+for i, txt in enumerate(data_by_country['Country']):
+    plt.annotate(txt, ((data_by_country.loc[i,'homicide rate']), (data_by_country.loc[i, 'ratePer10M'])))
+
+sns.regplot(x="homicide rate", y="ratePer10M", data=data_by_country, ax=ax)    
+
+fig.savefig('pofat_vs_hom_by_country_nolog.png')
 
 
 # In[ ]:
@@ -167,12 +194,19 @@ data_by_state = pd.merge(h_by_s[['state', 'comp_years_homicide', 'relpop']],
                 how = 'inner')
 data_by_state['pofat_rate'] = data_by_state['comp_years_pofat']/data_by_state['relpop']
 
+data_by_state['log_comp_years_homicide'] = np.log(data_by_state['comp_years_homicide'])
+data_by_state['log_pofat_rate'] = np.log(data_by_state['pofat_rate'])
+
 fig, ax = plt.subplots(figsize=(20,12))
 ax.scatter(x=np.log(data_by_state['comp_years_homicide']),
            y=np.log(data_by_state['pofat_rate']))
 
+data_by_state['log_pofat_rate'] = np.log(data_by_state['pofat_rate'])
+
 for i, txt in enumerate(data_by_state['state']):
     plt.annotate(txt, (np.log(data_by_state.loc[i,'comp_years_homicide']), np.log(data_by_state.loc[i, 'pofat_rate'])))
+
+sns.regplot(x="log_comp_years_homicide", y="log_pofat_rate", data=data_by_state, ax=ax) 
 
 fig.savefig('pofat_vs_hom_by_US_state.png')
 
@@ -187,6 +221,51 @@ data_by_state[['comp_years_homicide', 'pofat_rate']].corr()
 
 
 np.log(data_by_state[['pofat_rate','comp_years_homicide']]).corr()
+
+
+# In[ ]:
+
+
+
+fig, ax = plt.subplots(figsize=(20,12))
+ax.scatter(x=(data_by_state['comp_years_homicide']),
+           y=(data_by_state['pofat_rate']))
+
+for i, txt in enumerate(data_by_state['state']):
+    plt.annotate(txt, ((data_by_state.loc[i,'comp_years_homicide']), (data_by_state.loc[i, 'pofat_rate'])))
+sns.regplot(x="comp_years_homicide", y="pofat_rate", data=data_by_state, ax=ax) 
+
+fig.savefig('pofat_vs_hom_by_US_staten_nolog.png')
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
